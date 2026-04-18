@@ -160,10 +160,10 @@ app/src/main/java/com/example/projectconnect
 
 ## Notes
 
-- This version focuses on the core MVP features
-- Authentication and chat features are not included yet
-- Firebase Firestore is used for both user profiles and project data
-- The app currently uses test users for local feature testing
+This version focuses on the core features
+Authentication and chat features are not included yet
+Firebase Firestore is used for both user profiles and project data
+The app currently uses test users for local feature testing
 
 ---
 
