@@ -14,7 +14,7 @@ Users can create a new account by entering their name, email address, password, 
 
 The registration feature uses Firebase Authentication to create the user account. After registration, the app also creates a user profile document in Firestore using the Firebase user ID.
 
-<img width="1080" height="2424" alt="register" src="https://github.com/user-attachments/assets/d279efd2-2421-4889-89e9-725e354b4ac6" />
+<img src="https://github.com/user-attachments/assets/d279efd2-2421-4889-89e9-725e354b4ac6" alt="Register Screen" width="280" />
 
 
 ---
@@ -25,7 +25,7 @@ Registered users can log in using their email and password.
 
 The login screen includes validation, loading state handling, and error message display. After a successful login, the user is redirected to the project homepage.
 
-<img width="1080" height="2424" alt="Login" src="https://github.com/user-attachments/assets/0398ef30-ac92-4e72-b0a9-7becd025125f" />
+<img src="https://github.com/user-attachments/assets/0398ef30-ac92-4e72-b0a9-7becd025125f" alt="Login Screen" width="280" />
 
 
 
@@ -53,7 +53,7 @@ Project status can be:
 
 The homepage also provides buttons for creating a project, opening the profile page, and logging out.
 
-<img width="1080" height="2424" alt="homepage" src="https://github.com/user-attachments/assets/cac3d87c-600b-463f-857d-fd9240fbdb21" />
+<img src="https://github.com/user-attachments/assets/cac3d87c-600b-463f-857d-fd9240fbdb21" alt="Homepage and Project List" width="280" />
 
 
 ---
@@ -71,7 +71,7 @@ The project creation form includes:
 
 The app validates the form before allowing the project to be published. When a project is created, it is saved in Cloud Firestore and the current user is automatically added as the project owner and first member.
 
-<img width="1080" height="2424" alt="createproject" src="https://github.com/user-attachments/assets/30b3650d-8945-472a-a851-73e6bc78b7a3" />
+<img src="https://github.com/user-attachments/assets/30b3650d-8945-472a-a851-73e6bc78b7a3" alt="Create Project Screen" width="280" />
 
 
 ---
@@ -96,7 +96,7 @@ The available buttons depend on the user's role:
 - Non-members can join the project if it is not full.
 - Joined non-owner users can quit the project.
 
-<img width="1080" height="2424" alt="projectdetail" src="https://github.com/user-attachments/assets/8b9d064c-4791-4fc1-8dc5-3da0d7d2f546" />
+<img src="https://github.com/user-attachments/assets/8b9d064c-4791-4fc1-8dc5-3da0d7d2f546" alt="Project Detail Screen" width="280" />
 
 
 ---
@@ -116,7 +116,7 @@ Users can quit a project if they are a member but not the owner. Project owners 
 
 When users join, quit, or delete a project, the data is updated in Firestore.
 
-<img width="1080" height="2424" alt="Screenshot_1778868895" src="https://github.com/user-attachments/assets/3e44110f-1ce0-415b-9b1e-88c3b8293305" />
+<img src="https://github.com/user-attachments/assets/3e44110f-1ce0-415b-9b1e-88c3b8293305" alt="Join Quit Delete Project Screen" width="280" />
 
 
 
@@ -136,7 +136,7 @@ The chat feature allows users to:
 
 Only users who are members of the project can access the team chat. Messages are stored in a Firestore subcollection under the selected project.
 
-<img width="1080" height="2424" alt="Teamchat" src="https://github.com/user-attachments/assets/71b17208-90fa-4578-aecc-b186a013daad" />
+<img src="https://github.com/user-attachments/assets/71b17208-90fa-4578-aecc-b186a013daad" alt="Team Chat Screen" width="280" />
 
 
 ---
@@ -156,7 +156,7 @@ The profile page displays:
 
 This allows users to show their background and technical skills to other students.
 
-<img width="1080" height="2424" alt="ProfilePage" src="https://github.com/user-attachments/assets/1d44dd8e-c323-4284-b299-17940fb870af" />
+<img src="https://github.com/user-attachments/assets/1d44dd8e-c323-4284-b299-17940fb870af" alt="Profile Page" width="280" />
 
 
 ---
@@ -175,7 +175,7 @@ Editable profile fields include:
 
 Skills are entered as comma-separated text and converted into a list before being saved to Firestore.
 
-<img width="1080" height="2424" alt="EditProfile" src="https://github.com/user-attachments/assets/be8c4b83-d16f-4d2c-a872-75791af0fa1f" />
+<img src="https://github.com/user-attachments/assets/be8c4b83-d16f-4d2c-a872-75791af0fa1f" alt="Edit Profile Screen" width="280" />
 
 
 ---
