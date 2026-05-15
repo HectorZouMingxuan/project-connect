@@ -9,12 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.example.projectconnect.data.model.ChatMessage
 import com.example.projectconnect.data.model.Project
 import com.example.projectconnect.data.model.UserProfile
+import com.example.projectconnect.data.repository.AuthRepository
+import com.example.projectconnect.data.repository.ChatRepository
 import com.example.projectconnect.data.repository.ProjectRepository
 import com.example.projectconnect.data.repository.UserRepository
 import com.example.projectconnect.navigation.AppScreen
@@ -23,7 +25,11 @@ import com.example.projectconnect.ui.screen.EditProfileScreen
 import com.example.projectconnect.ui.screen.ProfileScreen
 import com.example.projectconnect.ui.screen.ProjectDetailScreen
 import com.example.projectconnect.ui.screen.ProjectListScreen
+import com.example.projectconnect.ui.screen.TeamChatScreen
+import com.example.projectconnect.ui.screen.auth.LoginScreen
+import com.example.projectconnect.ui.screen.auth.RegisterScreen
 import com.example.projectconnect.ui.theme.ProjectConnectTheme
+import com.example.projectconnect.ui.viewmodel.AuthViewModel
 import com.google.firebase.firestore.ListenerRegistration
 
 class MainActivity : ComponentActivity() {
@@ -41,42 +47,22 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppEntry() {
+    val authRepository = remember { AuthRepository() }
+    val authViewModel = remember { AuthViewModel() }
     val userRepository = remember { UserRepository() }
-    val projectRepository = remember { ProjectRepository() }
+    val projectRepository = remember { ProjectRepository(authRepository) }
+    val chatRepository = remember { ChatRepository() }
+
+    var currentUserId by remember {
+        mutableStateOf<String?>(null)
+    }
 
     var currentScreen by remember {
-        mutableStateOf(AppScreen.PROJECT_LIST)
-    }
-
-    var fakeUsers by remember {
-        mutableStateOf(
-            listOf(
-                UserProfile(
-                    userId = "user_001",
-                    username = "Hector",
-                    bio = "Software Engineering student looking for project teammates",
-                    faculty = "FSKTM",
-                    year = "Year 2",
-                    skills = listOf("Kotlin", "Java", "Firebase")
-                ),
-                UserProfile(
-                    userId = "user_002",
-                    username = "Adam",
-                    bio = "UI-focused student interested in app projects",
-                    faculty = "FSKTM",
-                    year = "Year 2",
-                    skills = listOf("UI Design", "Figma", "Testing")
-                )
-            )
-        )
-    }
-
-    var currentUserIndex by remember {
-        mutableIntStateOf(0)
+        mutableStateOf(AppScreen.LOGIN)
     }
 
     var userProfile by remember {
-        mutableStateOf(fakeUsers[currentUserIndex])
+        mutableStateOf<UserProfile?>(null)
     }
 
     var projects by remember {
@@ -85,6 +71,10 @@ fun AppEntry() {
 
     var selectedProject by remember {
         mutableStateOf<Project?>(null)
+    }
+
+    var chatMessages by remember {
+        mutableStateOf<List<ChatMessage>>(emptyList())
     }
 
     DisposableEffect(Unit) {
@@ -105,55 +95,130 @@ fun AppEntry() {
         }
     }
 
-    LaunchedEffect(currentUserIndex) {
-        val requestedProfile = fakeUsers[currentUserIndex]
-        val requestedUserId = requestedProfile.userId
+    DisposableEffect(currentScreen, selectedProject?.projectId) {
+        val project = selectedProject
+        if (currentScreen != AppScreen.TEAM_CHAT || project == null) {
+            chatMessages = emptyList()
+            onDispose {}
+        } else {
+            val registration: ListenerRegistration = chatRepository.listenToProjectMessages(
+                projectId = project.projectId,
+                onResult = { loadedMessages ->
+                    chatMessages = loadedMessages
+                },
+                onError = { errorMessage ->
+                    Log.e("Firestore", errorMessage)
+                }
+            )
+
+            onDispose {
+                registration.remove()
+            }
+        }
+    }
+
+    LaunchedEffect(currentUserId) {
+        val requestedUserId = currentUserId
+        if (requestedUserId == null) {
+            userProfile = null
+            return@LaunchedEffect
+        }
+
+        val currentUserEmail = authRepository.getCurrentUserEmail()
+        val defaultProfile = UserProfile(
+            userId = requestedUserId,
+            email = currentUserEmail,
+            username = currentUserEmail
+                .substringBefore("@")
+                .ifBlank { "Student" }
+        )
 
         userRepository.loadOrCreateUserProfile(
-            defaultProfile = requestedProfile,
+            defaultProfile = defaultProfile,
             onResult = { loadedProfile ->
                 if (loadedProfile.userId == requestedUserId) {
-                    userProfile = loadedProfile
+                    userProfile = loadedProfile.copy(
+                        email = loadedProfile.email.ifBlank { currentUserEmail }
+                    )
                 }
             },
             onError = { errorMessage ->
                 Log.e("Firestore", errorMessage)
-                userProfile = requestedProfile
+                userProfile = defaultProfile
             }
         )
     }
 
     when (currentScreen) {
-        AppScreen.PROJECT_LIST -> {
-            ProjectListScreen(
-                projects = projects,
-                currentUserId = userProfile.userId,
-                currentUsername = userProfile.username,
-                onSelectProject = { project ->
-                    selectedProject = project
-                    currentScreen = AppScreen.PROJECT_DETAIL
+        AppScreen.LOGIN -> {
+            LoginScreen(
+                authViewModel = authViewModel,
+                onGoToRegister = {
+                    authViewModel.clearLoginForm()
+                    currentScreen = AppScreen.REGISTER
                 },
-                onGoToCreateProject = {
-                    currentScreen = AppScreen.CREATE_PROJECT
-                },
-                onGoToProfile = {
-                    currentScreen = AppScreen.PROFILE
-                },
-                onSwitchUser = {
-                    currentUserIndex = if (currentUserIndex == 0) 1 else 0
+                onLoginSuccess = {
+                    currentUserId = authRepository.getCurrentUserId()
+                    authViewModel.clearAuthForms()
+                    currentScreen = AppScreen.PROJECT_LIST
                 }
             )
         }
 
+        AppScreen.REGISTER -> {
+            RegisterScreen(
+                authViewModel = authViewModel,
+                onGoToLogin = {
+                    authViewModel.clearRegisterForm()
+                    currentScreen = AppScreen.LOGIN
+                },
+                onRegisterSuccess = {
+                    currentUserId = authRepository.getCurrentUserId()
+                    authViewModel.clearAuthForms()
+                    currentScreen = AppScreen.PROJECT_LIST
+                }
+            )
+        }
+
+        AppScreen.PROJECT_LIST -> {
+            userProfile?.let { profile ->
+                ProjectListScreen(
+                    projects = projects,
+                    currentUserId = profile.userId,
+                    currentUsername = profile.username,
+                    onSelectProject = { project ->
+                        selectedProject = project
+                        currentScreen = AppScreen.PROJECT_DETAIL
+                    },
+                    onGoToCreateProject = {
+                        currentScreen = AppScreen.CREATE_PROJECT
+                    },
+                    onGoToProfile = {
+                        currentScreen = AppScreen.PROFILE
+                    },
+                    onLogout = {
+                        authRepository.logout()
+                        currentUserId = null
+                        userProfile = null
+                        selectedProject = null
+                        authViewModel.clearAuthForms()
+                        currentScreen = AppScreen.LOGIN
+                    }
+                )
+            }
+        }
+
         AppScreen.PROJECT_DETAIL -> {
-            selectedProject?.let { project ->
+            val profile = userProfile
+            val project = selectedProject
+
+            if (profile != null && project != null) {
                 ProjectDetailScreen(
                     project = project,
-                    currentUserId = userProfile.userId,
+                    currentUserId = profile.userId,
                     onJoinProject = {
                         projectRepository.joinProject(
                             project = project,
-                            userId = userProfile.userId,
                             onSuccess = { updatedProject ->
                                 selectedProject = updatedProject
                             },
@@ -161,6 +226,20 @@ fun AppEntry() {
                                 Log.e("Firestore", errorMessage)
                             }
                         )
+                    },
+                    onQuitProject = {
+                        projectRepository.quitProject(
+                            project = project,
+                            onSuccess = { updatedProject ->
+                                selectedProject = updatedProject
+                            },
+                            onError = { errorMessage ->
+                                Log.e("Firestore", errorMessage)
+                            }
+                        )
+                    },
+                    onOpenTeamChat = {
+                        currentScreen = AppScreen.TEAM_CHAT
                     },
                     onDeleteProject = {
                         projectRepository.deleteProject(
@@ -181,74 +260,135 @@ fun AppEntry() {
             }
         }
 
-        AppScreen.CREATE_PROJECT -> {
-            CreateProjectScreen(
-                onCreateProject = { title, description, requiredSkills, teamSize ->
-                    val newProject = Project(
-                        projectId = "project_${System.currentTimeMillis()}",
-                        title = title,
-                        description = description,
-                        ownerId = userProfile.userId,
-                        ownerName = userProfile.username,
-                        requiredSkills = requiredSkills,
-                        teamSize = teamSize,
-                        memberIds = listOf(userProfile.userId)
-                    )
+        AppScreen.TEAM_CHAT -> {
+            val profile = userProfile
+            val project = selectedProject
 
-                    projectRepository.createProject(
-                        project = newProject,
-                        onSuccess = {
-                            currentScreen = AppScreen.PROJECT_LIST
+            if (profile != null && project != null) {
+                val canUseChat = profile.userId in project.memberIds
+                if (canUseChat) {
+                    TeamChatScreen(
+                        project = project,
+                        messages = chatMessages,
+                        currentUserId = profile.userId,
+                        onSendMessage = { messageText, onMessageSent ->
+                            chatRepository.sendMessage(
+                                projectId = project.projectId,
+                                senderId = profile.userId,
+                                senderName = profile.username,
+                                memberIds = project.memberIds,
+                                text = messageText,
+                                onSuccess = {
+                                    onMessageSent()
+                                    Log.d("Firestore", "Message sent successfully.")
+                                },
+                                onError = { errorMessage ->
+                                    Log.e("Firestore", errorMessage)
+                                }
+                            )
                         },
-                        onError = { errorMessage ->
-                            Log.e("Firestore", errorMessage)
+                        onBack = {
+                            currentScreen = AppScreen.PROJECT_DETAIL
                         }
                     )
-                },
-                onBack = {
-                    currentScreen = AppScreen.PROJECT_LIST
+                } else {
+                    LaunchedEffect(project.projectId, profile.userId) {
+                        currentScreen = AppScreen.PROJECT_DETAIL
+                    }
                 }
-            )
+            }
+        }
+
+        AppScreen.CREATE_PROJECT -> {
+            userProfile?.let { profile ->
+                CreateProjectScreen(
+                    onCreateProject = { title, description, requiredSkills, teamSize ->
+                        val newProject = Project(
+                            projectId = "project_${System.currentTimeMillis()}",
+                            title = title,
+                            description = description,
+                            ownerName = profile.username,
+                            requiredSkills = requiredSkills,
+                            teamSize = teamSize
+                        )
+
+                        projectRepository.createProject(
+                            project = newProject,
+                            onSuccess = {
+                                currentScreen = AppScreen.PROJECT_LIST
+                            },
+                            onError = { errorMessage ->
+                                Log.e("Firestore", errorMessage)
+                            }
+                        )
+                    },
+                    onBack = {
+                        currentScreen = AppScreen.PROJECT_LIST
+                    }
+                )
+            }
         }
 
         AppScreen.PROFILE -> {
-            ProfileScreen(
-                userProfile = userProfile,
-                onGoToEditProfile = {
-                    currentScreen = AppScreen.EDIT_PROFILE
-                },
-                onBack = {
-                    currentScreen = AppScreen.PROJECT_LIST
-                }
-            )
+            userProfile?.let { profile ->
+                ProfileScreen(
+                    userProfile = profile,
+                    onGoToEditProfile = {
+                        currentScreen = AppScreen.EDIT_PROFILE
+                    },
+                    onLogout = {
+                        authRepository.logout()
+                        currentUserId = null
+                        userProfile = null
+                        selectedProject = null
+                        authViewModel.clearAuthForms()
+                        currentScreen = AppScreen.LOGIN
+                    },
+                    onBack = {
+                        currentScreen = AppScreen.PROJECT_LIST
+                    }
+                )
+            }
         }
 
         AppScreen.EDIT_PROFILE -> {
-            EditProfileScreen(
-                userProfile = userProfile,
-                onSave = { updatedProfile ->
-                    userProfile = updatedProfile
+            userProfile?.let { profile ->
+                EditProfileScreen(
+                    userProfile = profile,
+                    onSave = { updatedProfile ->
+                        val uid = authRepository.getCurrentUserId()
+                        if (uid == null) {
+                            Log.e("Auth", "No logged-in user found.")
+                            userProfile = null
+                            currentScreen = AppScreen.LOGIN
+                        } else {
+                            val profileToSave = updatedProfile.copy(
+                                userId = uid,
+                                email = updatedProfile.email.ifBlank {
+                                    profile.email.ifBlank { authRepository.getCurrentUserEmail() }
+                                }
+                            )
 
-                    fakeUsers = fakeUsers.mapIndexed { index, profile ->
-                        if (index == currentUserIndex) updatedProfile else profile
-                    }
+                            userProfile = profileToSave
 
-                    userRepository.saveUserProfile(
-                        profile = updatedProfile,
-                        onSuccess = {
-                            Log.d("Firestore", "Profile saved successfully.")
-                        },
-                        onError = { errorMessage ->
-                            Log.e("Firestore", errorMessage)
+                            userRepository.saveUserProfile(
+                                profile = profileToSave,
+                                onSuccess = {
+                                    Log.d("Firestore", "Profile saved successfully.")
+                                },
+                                onError = { errorMessage ->
+                                    Log.e("Firestore", errorMessage)
+                                }
+                            )
+
+                            currentScreen = AppScreen.PROFILE
                         }
-                    )
-
-                    currentScreen = AppScreen.PROFILE
-                },
-                onBack = {
-                    currentScreen = AppScreen.PROFILE
-                }
-            )
+                    },
+                    onBack = {
+                        currentScreen = AppScreen.PROFILE
+                    }
+                )
+            }
         }
     }
 }

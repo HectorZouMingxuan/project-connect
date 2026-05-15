@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -17,6 +16,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.projectconnect.ui.component.PrimaryActionButton
+import com.example.projectconnect.ui.component.PunkTitle
+import com.example.projectconnect.ui.component.SecondaryActionButton
 
 @Composable
 fun CreateProjectScreen(
@@ -46,10 +48,7 @@ fun CreateProjectScreen(
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text(
-            text = "Create Project",
-            style = MaterialTheme.typography.headlineMedium
-        )
+        PunkTitle(text = "Create Project")
 
         OutlinedTextField(
             value = title,
@@ -79,7 +78,8 @@ fun CreateProjectScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Button(
+        PrimaryActionButton(
+            text = "Publish Project",
             onClick = {
                 onCreateProject(
                     title.trim(),
@@ -92,12 +92,11 @@ fun CreateProjectScreen(
                 )
             },
             enabled = isValid
-        ) {
-            Text("Publish Project")
-        }
+        )
 
-        Button(onClick = onBack) {
-            Text("Cancel")
-        }
+        SecondaryActionButton(
+            text = "Cancel",
+            onClick = onBack
+        )
     }
 }

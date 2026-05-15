@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,6 +17,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.projectconnect.data.model.Project
+import com.example.projectconnect.ui.component.DangerActionButton
+import com.example.projectconnect.ui.component.PrimaryActionButton
+import com.example.projectconnect.ui.component.PunkTitle
+import com.example.projectconnect.ui.component.SecondaryActionButton
 
 @Composable
 fun ProjectListScreen(
@@ -27,7 +30,7 @@ fun ProjectListScreen(
     onSelectProject: (Project) -> Unit,
     onGoToCreateProject: () -> Unit,
     onGoToProfile: () -> Unit,
-    onSwitchUser: () -> Unit
+    onLogout: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -36,27 +39,27 @@ fun ProjectListScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text(
-            text = "Student Projects",
-            style = MaterialTheme.typography.headlineMedium
-        )
+        PunkTitle(text = "Student Projects")
 
         Text(text = "Current User: $currentUsername")
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Button(onClick = onGoToCreateProject) {
-                Text("Create Project")
-            }
+            PrimaryActionButton(
+                text = "Create Project",
+                onClick = onGoToCreateProject
+            )
 
-            Button(onClick = onGoToProfile) {
-                Text("Profile")
-            }
+            SecondaryActionButton(
+                text = "Profile",
+                onClick = onGoToProfile
+            )
 
-            Button(onClick = onSwitchUser) {
-                Text("Switch User")
-            }
+            DangerActionButton(
+                text = "Log Out",
+                onClick = onLogout
+            )
         }
 
         LazyColumn(

@@ -2,6 +2,7 @@ package com.example.projectconnect.data.model
 
 data class UserProfile(
     val userId: String = "",
+    val email: String = "",
     val username: String = "",
     val bio: String = "",
     val faculty: String = "",
