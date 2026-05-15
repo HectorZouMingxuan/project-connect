@@ -1,167 +1,398 @@
 # Project Connect
 
-Project Connect is a student collaboration Android application for discovering projects, creating teams, managing student profiles, and chatting with project members. The app is built with Kotlin, Jetpack Compose, Firebase Authentication, and Cloud Firestore.
+Project Connect is an Android mobile application that helps students discover projects, create teams, manage their personal profiles, and communicate with teammates through a project-based chat system.
 
-The main goal of the app is to make it easier for students to find teammates based on project needs, skills, and team availability.
+The app is built with Kotlin, Jetpack Compose, Firebase Authentication, and Cloud Firestore. It focuses on student collaboration by allowing users to find suitable projects based on project descriptions, required skills, and available team spaces.
 
 ---
 
-## Main Features
+## Features
 
-### 1. User Registration and Login
+### 1. User Registration
 
-- Register with name, email, password, and password confirmation.
-- Log in with Firebase Email/Password Authentication.
-- Show loading states while authentication requests are running.
-- Display validation and Firebase error messages.
-- Log out from the project list or profile page.
-- Automatically connect each user account to a Firestore profile document using the Firebase `uid`.
+Users can create a new account by entering their name, email address, password, and password confirmation.
 
-### 2. Student Profile Management
+The registration feature uses Firebase Authentication to create the user account. After registration, the app also creates a user profile document in Firestore using the Firebase user ID.
 
-- View the current user's profile.
-- Edit username, bio, faculty, year, and skills.
-- Store profile data in the Firestore `users` collection.
-- Load an existing profile after login.
-- Create a default profile automatically if a signed-in user does not have one yet.
-- Save skills as a list by converting comma-separated input into structured data.
+Photo to insert:
 
-### 3. Project Discovery
+```text
+screenshots/register.png
+```
 
-- Display all available student projects in a scrollable project list.
-- Show project title, owner name, required skills, member count, team size, and current status.
-- Status labels are calculated in the UI:
-  - `Owner`
-  - `Joined`
-  - `Full`
-  - `Open`
-- Use real-time Firestore listeners so project changes appear automatically.
+Use the screenshot that shows the Register page with the name, email, password, confirm password fields, Register button, and Back to login button.
 
-### 4. Project Creation
+![Register Screen](screenshots/register.png)
 
-- Create a new project with:
-  - project title
-  - description
-  - required skills
-  - team size
-- Validate that all required fields are filled before publishing.
-- Save new projects to the Firestore `projects` collection.
-- Automatically set the logged-in user as the project owner.
-- Automatically add the owner to the project member list.
+---
 
-### 5. Join and Quit Project
+### 2. User Login
 
-- Join open projects when the user is not the owner, not already a member, and the team is not full.
-- Quit a project after joining.
-- Prevent project owners from quitting their own project.
-- Update Firestore member lists when users join or quit.
-- Disable the join button when the user cannot join.
+Registered users can log in using their email and password.
 
-### 6. Project Detail Page
+The login screen includes validation, loading state handling, and error message display. After a successful login, the user is redirected to the project homepage.
 
-- View full project information:
-  - title
-  - owner
-  - description
-  - required skills
-  - current member count
-  - team size
-- Show different actions depending on user role:
-  - owners can delete the project
-  - joined members can open team chat
-  - joined non-owners can quit
-  - non-members can join if space is available
-- Confirm project deletion with an alert dialog.
+Photo to insert:
+
+```text
+screenshots/login.png
+```
+
+Use the screenshot that shows the Project Connect Login page with email and password fields.
+
+![Login Screen](screenshots/login.png)
+
+---
+
+### 3. Homepage and Project List
+
+After logging in, users can view the homepage that displays all available student projects.
+
+Each project card shows:
+
+- Project title
+- Project owner
+- Required skills
+- Current member count
+- Maximum team size
+- Project status
+
+Project status can be:
+
+- `Open`
+- `Joined`
+- `Owner`
+- `Full`
+
+The homepage also provides buttons for creating a project, opening the profile page, and logging out.
+
+Photo to insert:
+
+```text
+screenshots/homepage.png
+```
+
+Use the screenshot that shows the Student Projects page with several project cards.
+
+![Homepage](screenshots/homepage.png)
+
+---
+
+### 4. Create Project
+
+Users can create a new project by filling in a project form.
+
+The project creation form includes:
+
+- Project title
+- Project description
+- Required skills
+- Team size
+
+The app validates the form before allowing the project to be published. When a project is created, it is saved in Cloud Firestore and the current user is automatically added as the project owner and first member.
+
+Photo to insert:
+
+```text
+screenshots/create-project.png
+```
+
+Use the screenshot that shows the Create Project page with empty input fields and the Publish Project button.
+
+![Create Project](screenshots/create-project.png)
+
+---
+
+### 5. Project Detail
+
+Users can tap a project card to view the project detail page.
+
+The project detail page displays:
+
+- Project title
+- Owner name
+- Project description
+- Required skills
+- Current members
+- Maximum team size
+
+The available buttons depend on the user's role:
+
+- Project owner can delete the project.
+- Project members can open the team chat.
+- Non-members can join the project if it is not full.
+- Joined non-owner users can quit the project.
+
+Photo to insert:
+
+```text
+screenshots/project-detail.png
+```
+
+Use the screenshot that shows the Project Detail page with project information and action buttons.
+
+![Project Detail](screenshots/project-detail.png)
+
+---
+
+### 6. Join, Quit, and Delete Project
+
+Project Connect supports project membership management.
+
+Users can join a project if:
+
+- They are logged in.
+- They are not the project owner.
+- They have not already joined the project.
+- The project has available team space.
+
+Users can quit a project if they are a member but not the owner. Project owners cannot quit their own project, but they can delete it.
+
+When users join, quit, or delete a project, the data is updated in Firestore.
+
+Recommended photo:
+
+```text
+screenshots/project-detail.png
+```
+
+Use the Project Detail screenshot because it shows the action buttons for managing a project.
+
+---
 
 ### 7. Team Chat
 
-- Open a team chat from the project detail page.
-- Restrict chat access to project members only.
-- Send messages to a Firestore `messages` subcollection under each project.
-- Listen for chat updates in real time.
-- Sort messages by creation time.
-- Show different chat bubble styling for the current user and other members.
-- Auto-scroll to the newest message.
-- Prevent empty messages from being sent.
+Project members can open a team chat from the project detail page.
 
-### 8. App Navigation
+The chat feature allows users to:
 
-- Use a simple screen-state navigation flow with the `AppScreen` enum.
-- Supported screens:
-  - Login
-  - Register
-  - Project List
-  - Project Detail
-  - Team Chat
-  - Create Project
-  - Profile
-  - Edit Profile
-- Keep selected project, current user, profile, project list, and chat messages in Compose state.
+- Send messages to project teammates
+- View messages in real time
+- See their own messages aligned differently from other users' messages
+- View sender names and message times
+- Return to the project detail page
 
-### 9. Custom User Interface
+Only users who are members of the project can access the team chat. Messages are stored in a Firestore subcollection under the selected project.
 
-- Built fully with Jetpack Compose.
-- Uses Material 3 components such as cards, text fields, dialogs, buttons, and typography.
-- Uses a custom dark cyberpunk-inspired theme.
-- Includes reusable button components:
-  - `PrimaryActionButton`
-  - `SecondaryActionButton`
-  - `DangerActionButton`
-  - `QuietActionButton`
-- Includes a reusable `PunkTitle` composable with layered text, color offsets, and shadow effects.
-- Uses edge-to-edge layout, status bar padding, keyboard padding, and LazyColumn lists.
+Photo to insert:
+
+```text
+screenshots/team-chat.png
+```
+
+Use the screenshot that shows the Team Chat page with chat bubbles, message input, Send button, and Back button.
+
+![Team Chat](screenshots/team-chat.png)
+
+---
+
+### 8. Profile Page
+
+Each user has a personal profile page.
+
+The profile page displays:
+
+- Username
+- Email
+- Bio
+- Faculty
+- Year
+- Skills
+
+This allows users to show their background and technical skills to other students.
+
+Photo to insert:
+
+```text
+screenshots/profile.png
+```
+
+Use the screenshot that shows the Profile page with user information and profile action buttons.
+
+![Profile Page](screenshots/profile.png)
+
+---
+
+### 9. Edit Profile
+
+Users can update their profile information from the Edit Profile page.
+
+Editable profile fields include:
+
+- Username
+- Bio
+- Faculty
+- Year
+- Skills
+
+Skills are entered as comma-separated text and converted into a list before being saved to Firestore.
+
+Photo to insert:
+
+```text
+screenshots/edit-profile.png
+```
+
+Use the screenshot that shows the Edit Profile form with editable fields and Save button.
+
+![Edit Profile](screenshots/edit-profile.png)
 
 ---
 
 ## Techniques Used
 
-### Android Development
+### Kotlin
 
-- Kotlin programming language
-- Android Studio project structure
-- Jetpack Compose declarative UI
-- Material 3 design components
-- Compose state management with `remember`, `mutableStateOf`, and `LaunchedEffect`
-- Lifecycle-aware listener cleanup with `DisposableEffect`
-- Scrollable lists using `LazyColumn`
-- Keyboard-aware layout using `imePadding`
-- Edge-to-edge layout support
+Kotlin is used as the main programming language for the Android application. It is used to build the app logic, data models, repositories, ViewModel, and UI behavior.
 
-### Firebase Integration
+### Jetpack Compose
 
-- Firebase Authentication for email/password login and registration
-- Cloud Firestore for user profiles, projects, and chat messages
-- Firestore collections:
-  - `users`
-  - `projects`
-  - `projects/{projectId}/messages`
-- Firestore document mapping to Kotlin data classes
-- Snapshot listeners for real-time project and chat updates
-- Firestore subcollections for project-specific chat messages
-- Firebase `uid` used as the main user identity
+Jetpack Compose is used to build the user interface with a declarative UI approach.
 
-### App Architecture
+Compose techniques used in this project include:
 
-- Data models for structured app data:
-  - `UserProfile`
-  - `Project`
-  - `ChatMessage`
-- Repository classes to separate Firebase logic from UI logic:
-  - `AuthRepository`
-  - `UserRepository`
-  - `ProjectRepository`
-  - `ChatRepository`
-- `AuthViewModel` for authentication form state, validation, loading state, and error handling.
-- Screen-based navigation controlled from `MainActivity`.
-- Callback-based communication between screens and repositories.
+- `@Composable` functions
+- `remember`
+- `mutableStateOf`
+- `LaunchedEffect`
+- `DisposableEffect`
+- `LazyColumn`
+- `OutlinedTextField`
+- `Card`
+- `AlertDialog`
+- Material 3 buttons and typography
 
-### Data Handling
+### Firebase Authentication
 
-- Form validation before submitting login, registration, project, and chat data.
-- Comma-separated text parsing for skills.
-- Member list updates using distinct user ids.
-- Defensive checks for blank ids, blank messages, missing login state, and unauthorized chat access.
-- Timestamp-based message ordering.
+Firebase Authentication is used for account management.
+
+It handles:
+
+- User registration
+- User login
+- User logout
+- Current user ID
+- Current user email
+
+The Firebase user ID is used to connect each account to its own Firestore profile document.
+
+### Cloud Firestore
+
+Cloud Firestore is used as the backend database.
+
+The app stores:
+
+- User profile data
+- Project data
+- Project member IDs
+- Team chat messages
+
+Firestore data paths used:
+
+```text
+users/{uid}
+projects/{projectId}
+projects/{projectId}/messages/{messageId}
+```
+
+### Real-Time Updates
+
+Firestore snapshot listeners are used to update data in real time.
+
+Real-time updates are used for:
+
+- Project list changes
+- Project membership changes
+- Team chat messages
+
+When Firestore data changes, the UI updates automatically.
+
+### Repository Pattern
+
+Firebase operations are separated into repository classes.
+
+Repositories used:
+
+```text
+AuthRepository
+UserRepository
+ProjectRepository
+ChatRepository
+```
+
+This keeps Firebase logic separate from UI code and makes the project easier to maintain.
+
+### ViewModel State Management
+
+`AuthViewModel` manages the authentication screen state.
+
+It controls:
+
+- Login email
+- Login password
+- Register name
+- Register email
+- Register password
+- Confirm password
+- Loading state
+- Error messages
+- Login success state
+- Registration success state
+
+### Screen-Based Navigation
+
+The app uses an enum called `AppScreen` to manage navigation between screens.
+
+Screens include:
+
+```text
+LOGIN
+REGISTER
+PROJECT_LIST
+PROJECT_DETAIL
+TEAM_CHAT
+CREATE_PROJECT
+PROFILE
+EDIT_PROFILE
+```
+
+### Data Models
+
+The app uses Kotlin data classes to represent structured data.
+
+Data models used:
+
+```text
+UserProfile
+Project
+ChatMessage
+```
+
+These models are mapped to Firestore documents.
+
+### Custom UI Theme
+
+The app uses a custom dark neon theme.
+
+UI design techniques include:
+
+- Dark gradient background
+- Neon accent colors
+- Material 3 color scheme
+- Custom reusable buttons
+- Glitch-style title text
+- Rounded cards
+- Different button styles for primary, secondary, quiet, and danger actions
+
+Reusable UI components:
+
+```text
+PrimaryActionButton
+SecondaryActionButton
+DangerActionButton
+QuietActionButton
+PunkTitle
+```
 
 ---
 
@@ -169,111 +400,49 @@ The main goal of the app is to make it easier for students to find teammates bas
 
 | Category | Technology |
 | --- | --- |
-| Language | Kotlin |
+| Programming Language | Kotlin |
 | UI Framework | Jetpack Compose |
-| Design System | Material 3 |
+| UI Components | Material 3 |
 | Authentication | Firebase Authentication |
 | Database | Cloud Firestore |
-| Build Tool | Gradle Kotlin DSL |
-| Minimum SDK | 24 |
-| Target SDK | 36 |
+| Architecture Style | Repository Pattern with ViewModel state |
 | IDE | Android Studio |
+| Build Tool | Gradle Kotlin DSL |
 
 ---
 
-## Screenshots and Photos to Insert
+## Screenshot Placement Guide
 
-Place all images inside the `screenshots/` folder and link them from this README.
+Place all screenshots inside the `screenshots` folder in the project root.
 
-### Required App Screenshots
+Use these exact file names so the README image links work correctly:
 
-| Section | File Name | What Photo/Screenshot Should Be Inserted |
+| Original Photo | Put It Here | Used For |
 | --- | --- | --- |
-| Login | `screenshots/login.png` | Screenshot of the login screen showing the Project Connect title, email field, password field, login button, and create account link. |
-| Register | `screenshots/register.png` | Screenshot of the registration screen showing name, email, password, confirm password, and register button. |
-| Project List | `screenshots/project-list.png` | Screenshot of the main project list with several project cards and visible project statuses such as Open, Joined, Full, or Owner. |
-| Project Detail | `screenshots/project-detail.png` | Screenshot of one project detail page showing title, owner, description, required skills, members, and available action buttons. |
-| Create Project | `screenshots/create-project.png` | Screenshot of the create project form with title, description, required skills, team size, and publish button. |
-| Team Chat | `screenshots/team-chat.png` | Screenshot of a project team chat showing at least two messages, the message input field, and the send button. |
-| Profile | `screenshots/profile.png` | Screenshot of the profile page showing username, email, bio, faculty, year, and skills. |
-| Edit Profile | `screenshots/edit-profile.png` | Screenshot of the edit profile form with editable profile fields and save button. |
-| Delete Confirmation | `screenshots/delete-project-dialog.png` | Screenshot of the delete project confirmation dialog. |
+| `homepage.png` | `screenshots/homepage.png` | Homepage / Project List |
+| `Login.png` | `screenshots/login.png` | Login Screen |
+| `register.png` | `screenshots/register.png` | Register Screen |
+| `ProfilePage.png` | `screenshots/profile.png` | Profile Page |
+| `EditProfile.png` | `screenshots/edit-profile.png` | Edit Profile Page |
+| `projectdetail.png` | `screenshots/project-detail.png` | Project Detail Page |
+| `createproject.png` | `screenshots/create-project.png` | Create Project Page |
+| `Teamchat.png` | `screenshots/team-chat.png` | Team Chat Page |
 
-### Required Firebase Console Screenshots
-
-| Section | File Name | What Photo/Screenshot Should Be Inserted |
-| --- | --- | --- |
-| Firebase Authentication | `screenshots/firebase-auth-users.png` | Screenshot of Firebase Authentication showing registered test users. Hide or blur sensitive emails if needed. |
-| Firestore Users | `screenshots/firestore-data-user.png` | Screenshot of the Firestore `users` collection showing a user profile document with fields such as username, email, faculty, year, bio, and skills. |
-| Firestore Projects | `screenshots/firestore-data-project.png` | Screenshot of the Firestore `projects` collection showing project fields such as title, ownerId, ownerName, requiredSkills, teamSize, and memberIds. |
-| Firestore Chat Messages | `screenshots/firestore-chat-messages.png` | Screenshot of a `projects/{projectId}/messages` subcollection showing messageId, senderId, senderName, text, and createdAt. |
-
-### Current Screenshot Links
-
-Some screenshots already exist in the project. Add the missing images listed above when available.
-
-#### Project List
-
-![Project List](screenshots/project-list.png)
-
-#### Project Detail
-
-![Project Detail](screenshots/project-detail.png)
-
-#### Create Project
-
-![Create Project](screenshots/create-project.png)
-
-#### Profile
-
-![Profile](screenshots/profile.png)
-
-#### Edit Profile
-
-![Edit Profile](screenshots/edit-profile.png)
-
-#### Firestore User Data
-
-![Firestore User Data](screenshots/firestore-data-user.png)
-
-#### Firestore Project Data
-
-![Firestore Project Data](screenshots/firestore-data-project.png)
-
----
-
-## Firebase Setup
-
-1. Create a Firebase project.
-2. Add an Android app using this package name:
+Example folder structure:
 
 ```text
-com.example.projectconnect
+ProjectConnect
+|-- README.md
+|-- screenshots
+|   |-- homepage.png
+|   |-- login.png
+|   |-- register.png
+|   |-- profile.png
+|   |-- edit-profile.png
+|   |-- project-detail.png
+|   |-- create-project.png
+|   `-- team-chat.png
 ```
-
-3. Download `google-services.json`.
-4. Place `google-services.json` inside the `app/` folder.
-5. Enable Firebase Authentication.
-6. Enable the Email/Password sign-in provider.
-7. Enable Cloud Firestore.
-8. Create or allow access to these Firestore paths:
-   - `users/{uid}`
-   - `projects/{projectId}`
-   - `projects/{projectId}/messages/{messageId}`
-
-Important: `google-services.json` contains project-specific Firebase configuration. Do not commit a private production Firebase configuration to a public repository.
-
----
-
-## How to Run
-
-1. Clone or download the project.
-2. Open the folder in Android Studio.
-3. Add your Firebase `google-services.json` file to the `app/` folder.
-4. Sync Gradle.
-5. Run the app on an Android emulator or physical Android device.
-6. Register a new account.
-7. Create, join, quit, delete, and chat inside projects to test the full flow.
 
 ---
 
@@ -318,31 +487,58 @@ app/src/main/java/com/example/projectconnect
 
 ---
 
-## Example Test Flow
+## Firebase Setup
 
-1. Register a new account with name, email, and password.
-2. Confirm the new account appears in Firebase Authentication.
-3. Confirm a matching profile document appears in `users/{uid}`.
-4. Edit the profile and confirm the Firestore profile document updates.
-5. Create a project and confirm it appears in the project list.
-6. Confirm the new project appears in the Firestore `projects` collection.
-7. Log in as another user and join the project.
-8. Confirm the project `memberIds` field updates in Firestore.
-9. Open team chat and send messages as project members.
-10. Confirm messages appear in `projects/{projectId}/messages`.
-11. Quit the project as a non-owner.
-12. Delete the project as the owner.
+To run the application, Firebase must be configured.
+
+Steps:
+
+1. Create a Firebase project.
+2. Add an Android app to the Firebase project.
+3. Use the package name:
+
+```text
+com.example.projectconnect
+```
+
+4. Download the `google-services.json` file.
+5. Place `google-services.json` inside the `app` folder.
+6. Enable Firebase Authentication.
+7. Enable Email/Password sign-in.
+8. Enable Cloud Firestore.
 
 ---
 
-## Future Improvements
+## How to Run
 
-- Add search and filtering by skills, faculty, or project status.
-- Add project editing for project owners.
-- Add profile photos or avatars.
-- Add push notifications for chat messages.
-- Add stronger Firestore security rules.
-- Add Compose UI tests for login, project creation, and chat flows.
+1. Open the project in Android Studio.
+2. Add `google-services.json` into the `app` folder.
+3. Sync the Gradle project.
+4. Run the app on an Android emulator or Android device.
+5. Register a new account.
+6. Log in and test the project features.
+
+---
+
+## Testing Flow
+
+1. Register a new user account.
+2. Log in with the registered account.
+3. Edit the user profile.
+4. Create a new project.
+5. View the project on the homepage.
+6. Open the project detail page.
+7. Join or manage the project.
+8. Open the team chat.
+9. Send chat messages.
+10. Check Firestore to confirm that users, projects, and messages are saved.
+
+---
+
+## Conclusion
+
+Project Connect demonstrates a complete Android student collaboration app using modern Android development techniques. It combines Jetpack Compose UI, Firebase Authentication, Cloud Firestore, real-time updates, profile management, project management, and team chat into one mobile application.
+
 ---
 
 ## Author
