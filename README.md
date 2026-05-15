@@ -14,15 +14,8 @@ Users can create a new account by entering their name, email address, password, 
 
 The registration feature uses Firebase Authentication to create the user account. After registration, the app also creates a user profile document in Firestore using the Firebase user ID.
 
-Photo to insert:
+<img width="1080" height="2424" alt="register" src="https://github.com/user-attachments/assets/d279efd2-2421-4889-89e9-725e354b4ac6" />
 
-```text
-screenshots/register.png
-```
-
-Use the screenshot that shows the Register page with the name, email, password, confirm password fields, Register button, and Back to login button.
-
-![Register Screen](screenshots/register.png)
 
 ---
 
@@ -32,15 +25,9 @@ Registered users can log in using their email and password.
 
 The login screen includes validation, loading state handling, and error message display. After a successful login, the user is redirected to the project homepage.
 
-Photo to insert:
+<img width="1080" height="2424" alt="Login" src="https://github.com/user-attachments/assets/0398ef30-ac92-4e72-b0a9-7becd025125f" />
 
-```text
-screenshots/login.png
-```
 
-Use the screenshot that shows the Project Connect Login page with email and password fields.
-
-![Login Screen](screenshots/login.png)
 
 ---
 
@@ -66,15 +53,8 @@ Project status can be:
 
 The homepage also provides buttons for creating a project, opening the profile page, and logging out.
 
-Photo to insert:
+<img width="1080" height="2424" alt="homepage" src="https://github.com/user-attachments/assets/cac3d87c-600b-463f-857d-fd9240fbdb21" />
 
-```text
-screenshots/homepage.png
-```
-
-Use the screenshot that shows the Student Projects page with several project cards.
-
-![Homepage](screenshots/homepage.png)
 
 ---
 
@@ -91,15 +71,8 @@ The project creation form includes:
 
 The app validates the form before allowing the project to be published. When a project is created, it is saved in Cloud Firestore and the current user is automatically added as the project owner and first member.
 
-Photo to insert:
+<img width="1080" height="2424" alt="createproject" src="https://github.com/user-attachments/assets/30b3650d-8945-472a-a851-73e6bc78b7a3" />
 
-```text
-screenshots/create-project.png
-```
-
-Use the screenshot that shows the Create Project page with empty input fields and the Publish Project button.
-
-![Create Project](screenshots/create-project.png)
 
 ---
 
@@ -123,15 +96,8 @@ The available buttons depend on the user's role:
 - Non-members can join the project if it is not full.
 - Joined non-owner users can quit the project.
 
-Photo to insert:
+<img width="1080" height="2424" alt="projectdetail" src="https://github.com/user-attachments/assets/8b9d064c-4791-4fc1-8dc5-3da0d7d2f546" />
 
-```text
-screenshots/project-detail.png
-```
-
-Use the screenshot that shows the Project Detail page with project information and action buttons.
-
-![Project Detail](screenshots/project-detail.png)
 
 ---
 
@@ -150,13 +116,9 @@ Users can quit a project if they are a member but not the owner. Project owners 
 
 When users join, quit, or delete a project, the data is updated in Firestore.
 
-Recommended photo:
+<img width="1080" height="2424" alt="Screenshot_1778868895" src="https://github.com/user-attachments/assets/3e44110f-1ce0-415b-9b1e-88c3b8293305" />
 
-```text
-screenshots/project-detail.png
-```
 
-Use the Project Detail screenshot because it shows the action buttons for managing a project.
 
 ---
 
@@ -174,15 +136,8 @@ The chat feature allows users to:
 
 Only users who are members of the project can access the team chat. Messages are stored in a Firestore subcollection under the selected project.
 
-Photo to insert:
+<img width="1080" height="2424" alt="Teamchat" src="https://github.com/user-attachments/assets/71b17208-90fa-4578-aecc-b186a013daad" />
 
-```text
-screenshots/team-chat.png
-```
-
-Use the screenshot that shows the Team Chat page with chat bubbles, message input, Send button, and Back button.
-
-![Team Chat](screenshots/team-chat.png)
 
 ---
 
@@ -201,15 +156,8 @@ The profile page displays:
 
 This allows users to show their background and technical skills to other students.
 
-Photo to insert:
+<img width="1080" height="2424" alt="ProfilePage" src="https://github.com/user-attachments/assets/1d44dd8e-c323-4284-b299-17940fb870af" />
 
-```text
-screenshots/profile.png
-```
-
-Use the screenshot that shows the Profile page with user information and profile action buttons.
-
-![Profile Page](screenshots/profile.png)
 
 ---
 
@@ -227,15 +175,8 @@ Editable profile fields include:
 
 Skills are entered as comma-separated text and converted into a list before being saved to Firestore.
 
-Photo to insert:
+<img width="1080" height="2424" alt="EditProfile" src="https://github.com/user-attachments/assets/be8c4b83-d16f-4d2c-a872-75791af0fa1f" />
 
-```text
-screenshots/edit-profile.png
-```
-
-Use the screenshot that shows the Edit Profile form with editable fields and Save button.
-
-![Edit Profile](screenshots/edit-profile.png)
 
 ---
 
