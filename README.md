@@ -348,45 +348,7 @@ PunkTitle
 | Database | Cloud Firestore |
 | Architecture Style | Repository Pattern with ViewModel state |
 | IDE | Android Studio |
-| Build Tool | Gradle Kotlin DSL |
-
----
-
-## Screenshot Placement Guide
-
-Place all screenshots inside the `screenshots` folder in the project root.
-
-Use these exact file names so the README image links work correctly:
-
-| Original Photo | Put It Here | Used For |
-| --- | --- | --- |
-| `homepage.png` | `screenshots/homepage.png` | Homepage / Project List |
-| `Login.png` | `screenshots/login.png` | Login Screen |
-| `register.png` | `screenshots/register.png` | Register Screen |
-| `ProfilePage.png` | `screenshots/profile.png` | Profile Page |
-| `EditProfile.png` | `screenshots/edit-profile.png` | Edit Profile Page |
-| `projectdetail.png` | `screenshots/project-detail.png` | Project Detail Page |
-| `createproject.png` | `screenshots/create-project.png` | Create Project Page |
-| `Teamchat.png` | `screenshots/team-chat.png` | Team Chat Page |
-
-Example folder structure:
-
-```text
-ProjectConnect
-|-- README.md
-|-- screenshots
-|   |-- homepage.png
-|   |-- login.png
-|   |-- register.png
-|   |-- profile.png
-|   |-- edit-profile.png
-|   |-- project-detail.png
-|   |-- create-project.png
-|   `-- team-chat.png
-```
-
----
-
+| Build Tool | Gradle Kotlin 
 ## Project Structure
 
 ```text
